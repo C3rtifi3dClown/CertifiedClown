@@ -1,110 +1,254 @@
-:root {
-  --bg-top: #fff9f0;
-  --bg-bottom: #ffe5c4;
-  --ink: #20130b;
-  --ink-soft: #5c4030;
-  --accent: #d9480f;
-  --accent-soft: rgba(217, 72, 15, 0.12);
-  --card: rgba(255, 255, 255, 0.72);
-  --ring: rgba(255, 255, 255, 0.7);
+/* ─────────────────────────────────────────────
+   FONTS
+   Architects Daughter → display / headers
+   Caveat              → body / labels / accents
+───────────────────────────────────────────── */
 
-  font-family: 'Trebuchet MS', 'Segoe UI', sans-serif;
-  line-height: 1.5;
-  font-weight: 400;
+/* ─────────────────────────────────────────────
+   CSS VARIABLES
+───────────────────────────────────────────── */
+:root {
+  /* palette */
+  --paper:        #fbfaf7;
+  --paper-dark:   #f0ede4;
+  --ink:          #1c130a;
+  --ink-mid:      #4a3520;
+  --ink-faint:    #9c8270;
+  --red:          #c0392b;
+  --blue:         #1e4db7;
+  --yellow:       #f5c518;
+  --green:        #2e7d32;
+
+  /* sketchy shadow — offset "pen stroke" effect */
+  --shadow-sketch: 3px 3px 0 #1c130a;
+  --shadow-sketch-sm: 2px 2px 0 #1c130a;
+
+  /* typography */
+  --font-display: 'Architects Daughter', cursive;
+  --font-body:    'Caveat', cursive;
+
+  font-family: var(--font-body);
+  font-size: 18px;
+  line-height: 1.55;
   color: var(--ink);
-  background-color: var(--bg-top);
+  background-color: var(--paper);
   font-synthesis: none;
   text-rendering: optimizeLegibility;
   -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
 }
 
-* {
+/* ─────────────────────────────────────────────
+   RESET
+───────────────────────────────────────────── */
+*, *::before, *::after {
   box-sizing: border-box;
+  margin: 0;
+  padding: 0;
 }
 
+a {
+  color: var(--blue);
+  text-decoration: underline;
+  text-decoration-style: wavy;
+  text-underline-offset: 3px;
+}
+a:hover { color: var(--red); }
+
+/* ─────────────────────────────────────────────
+   PAPER BACKGROUND
+   Horizontal notebook lines + slight grain
+───────────────────────────────────────────── */
 body {
-  margin: 0;
   min-height: 100vh;
-  background:
-    radial-gradient(circle at 15% 10%, rgba(255, 215, 143, 0.6), transparent 40%),
-    radial-gradient(circle at 80% 90%, rgba(255, 140, 80, 0.45), transparent 45%),
-    linear-gradient(180deg, var(--bg-top), var(--bg-bottom));
+  background-color: var(--paper);
+  background-image:
+    /* faint ruled lines every 32px */
+    repeating-linear-gradient(
+      to bottom,
+      transparent,
+      transparent 31px,
+      rgba(150, 120, 80, 0.18) 31px,
+      rgba(150, 120, 80, 0.18) 32px
+    ),
+    /* left margin red line */
+    linear-gradient(
+      to right,
+      transparent 56px,
+      rgba(192, 57, 43, 0.15) 56px,
+      rgba(192, 57, 43, 0.15) 58px,
+      transparent 58px
+    );
 }
 
 #app {
   min-height: 100vh;
+  display: flex;
+  flex-direction: column;
 }
 
-.page {
-  min-height: 100vh;
-  display: grid;
-  place-items: center;
-  padding: 2rem;
+/* ─────────────────────────────────────────────
+   TYPOGRAPHY SCALE
+───────────────────────────────────────────── */
+h1, h2, h3, h4 {
+  font-family: var(--font-display);
+  line-height: 1.15;
 }
 
-.hero {
-  width: min(720px, 100%);
-  text-align: center;
-  padding: clamp(1.5rem, 4vw, 3rem);
-  border: 1px solid var(--ring);
-  border-radius: 24px;
-  background: var(--card);
-  backdrop-filter: blur(6px);
-  box-shadow:
-    0 20px 40px rgba(80, 34, 12, 0.16),
-    inset 0 1px 0 rgba(255, 255, 255, 0.75);
-  animation: rise-in 600ms ease-out both;
+h1 { font-size: clamp(2rem, 6vw, 3.5rem); }
+h2 { font-size: clamp(1.4rem, 3.5vw, 2rem); }
+h3 { font-size: clamp(1.1rem, 2.5vw, 1.5rem); }
+
+p { margin-bottom: 0.75em; }
+p:last-child { margin-bottom: 0; }
+
+/* ─────────────────────────────────────────────
+   SKETCHY BOX UTILITY
+   Multi-value border-radius creates uneven
+   hand-drawn corners without SVG filters.
+   The pseudo-element lets us displace only the
+   border, keeping inner text crisp.
+───────────────────────────────────────────── */
+.sketch-box {
+  position: relative;
+  background: var(--paper);
+  padding: 1.25rem 1.5rem;
+  border: 2.5px solid var(--ink);
+  /* 8-value radius: H radii / V radii — each corner differs */
+  border-radius: 2px 8px 3px 6px / 8px 2px 7px 3px;
+  box-shadow: var(--shadow-sketch);
+  transition: box-shadow 0.15s ease, transform 0.15s ease;
+}
+.sketch-box:hover {
+  box-shadow: 5px 5px 0 var(--ink);
+  transform: translate(-1px, -1px);
 }
 
-.eyebrow {
-  margin: 0;
-  color: var(--accent);
-  text-transform: uppercase;
-  letter-spacing: 0.16em;
+/* darker variant */
+.sketch-box--dark {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+/* ─────────────────────────────────────────────
+   SKETCHY BUTTON
+───────────────────────────────────────────── */
+.btn-sketch {
+  display: inline-block;
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  padding: 0.45em 1.1em;
+  border: 2px solid var(--ink);
+  border-radius: 4px 10px 5px 9px / 9px 4px 10px 5px;
+  background: var(--paper);
+  color: var(--ink);
+  cursor: pointer;
+  box-shadow: var(--shadow-sketch-sm);
+  transition: box-shadow 0.12s ease, transform 0.12s ease, background 0.12s ease;
+  text-decoration: none;
+  line-height: 1.3;
+  white-space: nowrap;
+}
+.btn-sketch:hover {
+  background: var(--ink);
+  color: var(--paper);
+  box-shadow: 4px 4px 0 var(--ink-mid);
+  transform: translate(-1px, -1px);
+}
+.btn-sketch:active {
+  transform: translate(1px, 1px);
+  box-shadow: 1px 1px 0 var(--ink-mid);
+}
+
+/* accent variants */
+.btn-sketch--red   { border-color: var(--red);  box-shadow: 2px 2px 0 var(--red);  }
+.btn-sketch--blue  { border-color: var(--blue); box-shadow: 2px 2px 0 var(--blue); }
+.btn-sketch--red:hover  { background: var(--red);  color: #fff; box-shadow: 4px 4px 0 #7b1f1f; }
+.btn-sketch--blue:hover { background: var(--blue); color: #fff; box-shadow: 4px 4px 0 #0e2a70; }
+
+/* ─────────────────────────────────────────────
+   TAGS / LABELS
+───────────────────────────────────────────── */
+.tag {
+  display: inline-block;
+  font-family: var(--font-display);
   font-size: 0.75rem;
-  font-weight: 700;
-  animation: fade-in 800ms ease-out 140ms both;
+  padding: 0.2em 0.65em;
+  border: 1.5px solid var(--ink);
+  border-radius: 3px 9px 4px 8px / 8px 3px 9px 4px;
+  background: var(--yellow);
+  color: var(--ink);
+  box-shadow: 1px 1px 0 var(--ink);
+  transform: rotate(-1deg);
+  white-space: nowrap;
+}
+.tag:nth-child(even) { transform: rotate(1deg); background: #e8f5e9; }
+.tag:nth-child(3n)   { transform: rotate(-0.5deg); background: #e3f2fd; }
+
+/* ─────────────────────────────────────────────
+   SECTION WRAPPER
+───────────────────────────────────────────── */
+.view-container {
+  width: min(860px, 100%);
+  margin: 0 auto;
+  padding: 2rem 1.25rem 4rem;
 }
 
-h1 {
-  margin: 0.5rem 0 0;
-  font-family: Georgia, 'Times New Roman', serif;
-  font-size: clamp(2.4rem, 8vw, 5.2rem);
-  line-height: 1.05;
-  letter-spacing: -0.03em;
-  animation: fade-in 800ms ease-out 220ms both;
+/* ─────────────────────────────────────────────
+   SECTION HEADING WITH UNDERLINE DOODLE
+───────────────────────────────────────────── */
+.section-title {
+  position: relative;
+  display: inline-block;
+  margin-bottom: 2rem;
+}
+.section-title::after {
+  content: '';
+  position: absolute;
+  left: -4px;
+  right: -4px;
+  bottom: -6px;
+  height: 4px;
+  background: var(--red);
+  border-radius: 0 3px 0 3px;
+  transform: rotate(-0.8deg);
 }
 
-.subtitle {
-  margin: 1rem auto 0;
-  max-width: 42ch;
-  color: var(--ink-soft);
-  font-size: clamp(1rem, 3vw, 1.15rem);
-  padding: 0.8rem 1rem;
-  border-radius: 12px;
-  background: var(--accent-soft);
-  animation: fade-in 800ms ease-out 320ms both;
+/* ─────────────────────────────────────────────
+   DIVIDER (hand-drawn dashes)
+───────────────────────────────────────────── */
+.divider {
+  border: none;
+  border-top: 2px dashed rgba(28, 19, 10, 0.25);
+  margin: 2rem 0;
+  transform: rotate(-0.3deg);
 }
 
-@keyframes rise-in {
-  from {
-    opacity: 0;
-    transform: translateY(20px) scale(0.98);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0) scale(1);
-  }
+/* ─────────────────────────────────────────────
+   FOOTER
+───────────────────────────────────────────── */
+.site-footer {
+  margin-top: auto;
+  padding: 1.25rem;
+  text-align: center;
+  font-family: var(--font-display);
+  font-size: 0.85rem;
+  color: var(--ink-faint);
+  border-top: 2px dashed rgba(28, 19, 10, 0.2);
 }
 
-@keyframes fade-in {
-  from {
-    opacity: 0;
-    transform: translateY(10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+/* ─────────────────────────────────────────────
+   ANIMATIONS
+───────────────────────────────────────────── */
+@keyframes sketch-in {
+  from { opacity: 0; transform: translateY(12px) rotate(-1deg); }
+  to   { opacity: 1; transform: translateY(0)    rotate(0deg);  }
 }
+
+.animate-in {
+  animation: sketch-in 0.4s ease-out both;
+}
+.animate-in:nth-child(2) { animation-delay: 80ms;  }
+.animate-in:nth-child(3) { animation-delay: 160ms; }
+.animate-in:nth-child(4) { animation-delay: 240ms; }
+.animate-in:nth-child(5) { animation-delay: 320ms; }
+.animate-in:nth-child(6) { animation-delay: 400ms; }

@@ -1,78 +1,5 @@
 <script setup lang="ts">
-const zines = [
-  {
-    id: 1,
-    title: 'Issue #001',
-    subtitle: 'everything is fine',
-    pages: 16,
-    date: 'Oct 2024',
-    tags: ['rant', 'collage', 'first issue'],
-    color: '#fff3e0',
-    rot: '-1.5deg',
-    stamp: '✓ DONE',
-    stampColor: '#2e7d32',
-  },
-  {
-    id: 2,
-    title: 'Issue #002',
-    subtitle: 'the loud issue',
-    pages: 20,
-    date: 'Dec 2024',
-    tags: ['music', 'show reviews', 'photos'],
-    color: '#fce4ec',
-    rot: '1deg',
-    stamp: '✓ DONE',
-    stampColor: '#2e7d32',
-  },
-  {
-    id: 3,
-    title: 'Issue #003',
-    subtitle: 'something about winter',
-    pages: 12,
-    date: 'Feb 2025',
-    tags: ['poetry', 'drawings', 'sad'],
-    color: '#e8eaf6',
-    rot: '-0.6deg',
-    stamp: '✓ DONE',
-    stampColor: '#2e7d32',
-  },
-  {
-    id: 4,
-    title: 'Issue #004',
-    subtitle: '???',
-    pages: null,
-    date: 'coming soon',
-    tags: ['tba'],
-    color: '#f5f5f5',
-    rot: '1.3deg',
-    stamp: 'WIP',
-    stampColor: '#c0392b',
-  },
-  {
-    id: 5,
-    title: 'SPLIT zine',
-    subtitle: 'w/ a friend',
-    pages: 24,
-    date: 'Apr 2025',
-    tags: ['collaboration', 'art', 'misc'],
-    color: '#e0f7fa',
-    rot: '-1deg',
-    stamp: '✓ DONE',
-    stampColor: '#2e7d32',
-  },
-  {
-    id: 6,
-    title: 'Mini #01',
-    subtitle: 'pocket sized ramblings',
-    pages: 8,
-    date: 'May 2025',
-    tags: ['mini zine', 'travel'],
-    color: '#fff8e1',
-    rot: '0.5deg',
-    stamp: '✓ DONE',
-    stampColor: '#2e7d32',
-  },
-]
+import { fanzines } from '../data/mediaData.js'
 </script>
 
 <template>
@@ -97,25 +24,32 @@ const zines = [
     <!-- ── Zine grid ──────────────────────────────── -->
     <ul class="zines-grid" aria-label="Zine catalogue">
       <li
-        v-for="zine in zines"
+        v-for="zine in fanzines"
         :key="zine.id"
         class="zine-card animate-in"
         :style="{ '--rot': zine.rot }"
       >
-        <!-- Cover (photocopied look) -->
+        <!-- Cover: real image if available, otherwise xerox placeholder -->
         <div
           class="zine-card__cover"
           :style="{ '--cover-bg': zine.color }"
         >
-          <!-- Halftone grid overlay for that xerox feel -->
-          <div class="zine-card__halftone" aria-hidden="true"></div>
+          <img
+            v-if="zine.coverUrl"
+            :src="zine.coverUrl"
+            :alt="`${zine.title} — ${zine.subtitle} cover`"
+            class="zine-card__cover-img"
+          />
+          <template v-else>
+            <!-- Halftone grid overlay for that xerox feel -->
+            <div class="zine-card__halftone" aria-hidden="true"></div>
+            <div class="zine-card__cover-text">
+              <span class="zine-card__cover-issue">{{ zine.title }}</span>
+              <span class="zine-card__cover-sub">{{ zine.subtitle }}</span>
+            </div>
+          </template>
 
-          <div class="zine-card__cover-text">
-            <span class="zine-card__cover-issue">{{ zine.title }}</span>
-            <span class="zine-card__cover-sub">{{ zine.subtitle }}</span>
-          </div>
-
-          <!-- Rubber stamp -->
+          <!-- Rubber stamp (always visible) -->
           <div
             class="zine-card__stamp"
             :style="{ '--stamp-color': zine.stampColor }"
@@ -132,25 +66,40 @@ const zines = [
             <span v-if="zine.pages" class="zine-card__pages">{{ zine.pages }}pp</span>
           </div>
 
+          <p class="zine-card__desc">{{ zine.description }}</p>
+
           <div class="zine-card__tags">
             <span v-for="tag in zine.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
 
           <div class="zine-card__actions">
-            <button class="btn-sketch btn-sketch--blue zine-card__btn">
-              download PDF →
-            </button>
+            <template v-if="zine.pdfUrl">
+              <!-- Download: browser will prompt Save As -->
+              <a
+                :href="zine.pdfUrl"
+                download
+                class="btn-sketch btn-sketch--blue zine-card__btn"
+              >↓ download</a>
+              <!-- Read online: opens PDF in browser tab -->
+              <a
+                :href="zine.pdfUrl"
+                target="_blank"
+                rel="noopener noreferrer"
+                class="btn-sketch zine-card__btn"
+              >read online →</a>
+            </template>
+            <span v-else class="zine-card__coming-soon">coming soon</span>
           </div>
         </div>
       </li>
     </ul>
 
-    <!-- ── Placeholder note ───────────────────────── -->
+    <!-- ── Note ──────────────────────────────────── -->
     <div class="sketch-box fanzines-note animate-in">
       <p>
-        🗂️ <strong>PDF placeholder:</strong> link each "download PDF →" button to a file in
-        <code>/public/zines/</code>. All zines are placeholder UI — replace
-        cover colours &amp; data with your real issues.
+        ☁️ <strong>Cloud storage:</strong> upload PDFs and cover images to your
+        Backblaze B2 bucket, then paste the public URLs into
+        <code>src/data/mediaData.js</code> — no other code changes needed.
       </p>
     </div>
 
@@ -308,10 +257,44 @@ const zines = [
 .zine-card__actions {
   margin-top: auto;
   padding-top: 0.25rem;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.35rem;
 }
 
 .zine-card__btn {
   font-size: 0.78rem;
   padding: 0.3em 0.7em;
+}
+
+/* Cover image (fills the 200px cover block) */
+.zine-card__cover-img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center top;
+  display: block;
+}
+
+/* One-line description */
+.zine-card__desc {
+  font-size: 0.78rem;
+  color: var(--ink-mid);
+  font-style: italic;
+  margin: 0;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* "Coming soon" placeholder where buttons would be */
+.zine-card__coming-soon {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  font-style: italic;
 }
 </style>

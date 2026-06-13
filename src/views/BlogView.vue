@@ -1,42 +1,80 @@
 <script setup lang="ts">
-const posts = [
-  {
-    id: 1,
-    title: 'Why I Started Making Zines',
-    date: 'Mar 2025',
-    excerpt:
-      "There's something about photocopiers and scissors and glue sticks that no digital tool has ever replicated for me. A meditation on analog creation.",
-    tags: ['zines', 'making stuff', 'tangents'],
-    rot: '-1.1deg',
-  },
-  {
-    id: 2,
-    title: 'Notes on Playing a Show to Seven People',
-    date: 'Jan 2025',
-    excerpt:
-      "Six of whom were my friends. One was a guy who wandered in because it was raining. Best show I've ever played.",
-    tags: ['music', 'live', 'small venues'],
-    rot: '0.7deg',
-  },
-  {
-    id: 3,
-    title: 'On the Art of the Unfinished Project',
-    date: 'Nov 2024',
-    excerpt:
-      "I have seventeen unfinished songs, four half-done zines, and a blog I only just started. Maybe the process is the point?",
-    tags: ['process', 'creativity', 'rambling'],
-    rot: '-0.6deg',
-  },
-  {
-    id: 4,
-    title: 'A Playlist for Rainy Tuesday Afternoons',
-    date: 'Sep 2024',
-    excerpt:
-      "Self-explanatory. A loose collection of songs that feel like grey light through a window.",
-    tags: ['music', 'playlist'],
-    rot: '1.2deg',
-  },
-]
+import { computed, onMounted, ref, watch } from 'vue'
+import { marked } from 'marked'
+import DOMPurify from 'dompurify'
+import { blogPosts } from '../data/mediaData'
+
+interface BlogPost {
+  id: number
+  slug: string
+  title: string
+  date: string
+  excerpt: string
+  tags: string[]
+  rot: string
+  url: string
+}
+
+const posts = blogPosts as BlogPost[]
+const selectedPostId = ref(posts[0]?.id ?? 0)
+
+const isLoading = ref(false)
+const errorMessage = ref('')
+const renderedHtml = ref('')
+
+const selectedPost = computed(() =>
+  posts.find((post) => post.id === selectedPostId.value)
+)
+
+function resolveFetchUrl(rawUrl: string): string {
+  if (
+    import.meta.env.DEV &&
+    rawUrl.startsWith('https://f003.backblazeb2.com/')
+  ) {
+    return `/b2/${rawUrl.replace('https://f003.backblazeb2.com/', '')}`
+  }
+
+  return rawUrl
+}
+
+async function loadPost(post: BlogPost | undefined) {
+  if (!post) {
+    renderedHtml.value = ''
+    errorMessage.value = 'No post selected.'
+    return
+  }
+
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const response = await fetch(resolveFetchUrl(post.url))
+    if (!response.ok) {
+      throw new Error(`Failed to fetch post (${response.status})`)
+    }
+
+    const markdown = await response.text()
+    const parsedHtml = await marked.parse(markdown)
+    renderedHtml.value = DOMPurify.sanitize(parsedHtml)
+  } catch (error) {
+    renderedHtml.value = ''
+    if (error instanceof TypeError) {
+      errorMessage.value = 'Could not load this post. This usually means the bucket CORS policy is missing for fetch().'
+    } else {
+      errorMessage.value = 'Could not load this post right now. Please try again later.'
+    }
+  } finally {
+    isLoading.value = false
+  }
+}
+
+watch(selectedPost, (post) => {
+  void loadPost(post)
+})
+
+onMounted(() => {
+  void loadPost(selectedPost.value)
+})
 </script>
 
 <template>
@@ -56,6 +94,7 @@ const posts = [
         v-for="post in posts"
         :key="post.id"
         class="blog-post sketch-box animate-in"
+        :class="{ 'blog-post--active': post.id === selectedPostId }"
         :style="{ '--rot': post.rot }"
       >
         <!-- torn-paper top edge decoration -->
@@ -73,12 +112,32 @@ const posts = [
           <div class="blog-post__tags">
             <span v-for="tag in post.tags" :key="tag" class="tag">{{ tag }}</span>
           </div>
-          <button class="btn-sketch btn-sketch--blue blog-post__read">
+          <button
+            class="btn-sketch btn-sketch--blue blog-post__read"
+            type="button"
+            @click="selectedPostId = post.id"
+          >
             read more →
           </button>
         </div>
       </li>
     </ul>
+
+    <!-- ── Markdown article ───────────────────────── -->
+    <article class="blog-reader sketch-box animate-in" aria-live="polite">
+      <header class="blog-reader__header" v-if="selectedPost">
+        <h2 class="blog-reader__title">{{ selectedPost.title }}</h2>
+        <p class="blog-reader__meta">{{ selectedPost.date }}</p>
+      </header>
+
+      <p v-if="isLoading" class="blog-reader__loading">Loading...</p>
+      <p v-else-if="errorMessage" class="blog-reader__error">{{ errorMessage }}</p>
+      <div
+        v-else
+        class="blog-reader__content markdown-body"
+        v-html="renderedHtml"
+      ></div>
+    </article>
 
     <!-- ── More placeholder ────────────────────────── -->
     <div class="blog-more animate-in">
@@ -120,6 +179,10 @@ const posts = [
 }
 .blog-post:hover {
   transform: rotate(0deg) translateX(3px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+.blog-post--active {
   box-shadow: 5px 5px 0 var(--ink);
 }
 
@@ -174,6 +237,89 @@ const posts = [
 
 .blog-post__read {
   flex-shrink: 0;
+}
+
+/* ── Reader ──────────────────────────────────────── */
+.blog-reader {
+  margin: 0 0 2rem;
+  padding: 1.25rem 1.4rem;
+  background: var(--paper-dark);
+}
+
+.blog-reader__header {
+  border-bottom: 2px dashed rgba(28, 19, 10, 0.25);
+  margin-bottom: 1rem;
+  padding-bottom: 0.6rem;
+}
+
+.blog-reader__title {
+  font-size: clamp(1.2rem, 3.5vw, 1.55rem);
+  margin-bottom: 0.25rem;
+}
+
+.blog-reader__meta {
+  margin: 0;
+  color: var(--ink-faint);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+}
+
+.blog-reader__loading,
+.blog-reader__error {
+  margin: 0;
+  font-family: var(--font-display);
+  font-size: 1rem;
+  letter-spacing: 0.03em;
+}
+
+.blog-reader__loading {
+  color: var(--ink-mid);
+  display: inline-block;
+  animation: jitter 0.2s steps(2, end) infinite;
+}
+
+.blog-reader__error {
+  color: #8c2f2f;
+}
+
+.blog-reader__content {
+  color: var(--ink);
+  line-height: 1.7;
+}
+
+.blog-reader__content :deep(h1),
+.blog-reader__content :deep(h2),
+.blog-reader__content :deep(h3) {
+  margin-top: 1.2rem;
+  margin-bottom: 0.55rem;
+}
+
+.blog-reader__content :deep(p),
+.blog-reader__content :deep(ul),
+.blog-reader__content :deep(ol),
+.blog-reader__content :deep(blockquote) {
+  margin: 0.75rem 0;
+}
+
+.blog-reader__content :deep(pre) {
+  background: rgba(28, 19, 10, 0.07);
+  border: 1.5px solid rgba(28, 19, 10, 0.18);
+  border-radius: 5px;
+  padding: 0.75rem;
+  overflow-x: auto;
+}
+
+.blog-reader__content :deep(code) {
+  font-size: 0.92em;
+}
+
+@keyframes jitter {
+  0% {
+    transform: translate(0, 0) rotate(-0.2deg);
+  }
+  100% {
+    transform: translate(1px, -1px) rotate(0.2deg);
+  }
 }
 
 /* ── More placeholder ──────────────────────────── */

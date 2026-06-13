@@ -9,5 +9,14 @@ export default defineConfig(() => {
   return {
     plugins: [vue()],
     base,
+    server: {
+      proxy: {
+        '/b2': {
+          target: 'https://f003.backblazeb2.com',
+          changeOrigin: true,
+          rewrite: (path) => path.replace(/^\/b2/, ''),
+        },
+      },
+    },
   }
 })

@@ -1,2 +1,1 @@
-# CertifiedClown official website bitch
-
+# CertifiedClown personal blog

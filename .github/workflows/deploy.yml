@@ -10,6 +10,10 @@ on:
       - main
       - master
 
+# Add environment variable to force Node 24 execution and silence GitHub warnings
+env:
+  FORCE_JAVASCRIPT_ACTIONS_TO_NODE24: true
+
 jobs:
   build-and-deploy:
     runs-on: ubuntu-latest
@@ -25,17 +29,18 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          # Upgraded from 18 to 22 (the current reliable LTS version for Vue/Vite)
+          node-version: '22'
           cache: 'npm'
 
       - name: Install dependencies
-        run: npm install
+        run: npm ci # Using 'npm ci' is cleaner for automated runners than 'npm install'
 
       - name: Build
         run: npm run build
 
       - name: Setup Pages
-        uses: actions/configure-pages@v4
+        uses: actions/configure-pages@v5 # Upgraded to latest v5
 
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3

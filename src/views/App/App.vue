@@ -1,6 +1,6 @@
 <script setup lang="ts">
-import GlobalMusicPlayer from './components/GlobalMusicPlayer.vue'
-import Navbar from './components/Navbar.vue'
+import GlobalMusicPlayer from '../../components/GlobalMusicPlayer/GlobalMusicPlayer.vue'
+import Navbar from '../../components/Navbar/Navbar.vue'
 </script>
 
 <template>
@@ -45,36 +45,4 @@ import Navbar from './components/Navbar.vue'
   </div>
 </template>
 
-<style>
-/* ── Page transition ─────────────────────────────── */
-.page-enter-active,
-.page-leave-active {
-  transition: opacity 0.2s ease, transform 0.2s ease;
-}
-.page-enter-from {
-  opacity: 0;
-  transform: translateY(8px) rotate(-0.5deg);
-}
-.page-leave-to {
-  opacity: 0;
-  transform: translateY(-8px) rotate(0.5deg);
-}
-
-/* ── App shell layout ────────────────────────────── */
-#app-shell {
-  display: flex;
-  flex-direction: column;
-  min-height: 100vh;
-}
-
-.main-content {
-  flex: 1;
-  padding-bottom: 7.25rem;
-}
-
-@media (max-width: 640px) {
-  .main-content {
-    padding-bottom: 6.5rem;
-  }
-}
-</style>
+<style src="./App.css"></style>

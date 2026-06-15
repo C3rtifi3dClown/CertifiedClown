@@ -1,0 +1,191 @@
+/* ── Header ──────────────────────────────────────── */
+.music-header {
+  padding: 2.5rem 0 0.5rem;
+}
+.music-header__sub {
+  color: var(--ink-mid);
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  margin-top: 0.5rem;
+}
+
+/* ── Release cards grid ──────────────────────────── */
+.music-releases {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+  gap: 1.5rem;
+  margin: 2rem 0;
+}
+
+/* ── Cassette card ───────────────────────────────── */
+.cassette {
+  transform: rotate(var(--rot, 0deg));
+  padding: 0;
+  overflow: hidden;
+  transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.cassette:hover {
+  transform: rotate(0deg) translateY(-3px);
+  box-shadow: 5px 5px 0 var(--ink);
+}
+
+/* Cassette header (tape reel decoration) */
+.cassette__header {
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+  padding: 0.9rem 1.1rem;
+  background: var(--cassette-bg, #fff8e1);
+  border-bottom: 2px solid var(--ink);
+}
+
+.cassette__spool {
+  width: 38px;
+  height: 38px;
+  border: 2.5px solid var(--ink);
+  border-radius: 50%;
+  display: grid;
+  place-items: center;
+  flex-shrink: 0;
+}
+.cassette__spool-inner {
+  width: 14px;
+  height: 14px;
+  border: 2px solid var(--ink);
+  border-radius: 50%;
+  background: var(--paper);
+}
+
+.cassette__label {
+  flex: 1;
+  text-align: center;
+}
+.cassette__label-title {
+  font-family: var(--font-display);
+  font-size: 0.95rem;
+  font-weight: 700;
+  line-height: 1.2;
+}
+.cassette__label-year {
+  font-family: var(--font-display);
+  font-size: 0.72rem;
+  color: var(--ink-faint);
+}
+
+/* Track list */
+.cassette__tracklist {
+  list-style: none;
+  padding: 0.6rem 1.1rem;
+  display: flex;
+  flex-direction: column;
+  gap: 0.2rem;
+}
+
+.cassette__track {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.35rem 0.4rem;
+  border-radius: 3px;
+  font-size: 0.92rem;
+  transition: background 0.12s ease;
+}
+.cassette__track:hover {
+  background: rgba(28, 19, 10, 0.05);
+}
+.cassette__track--playing {
+  background: rgba(28, 19, 10, 0.08);
+  font-weight: 600;
+}
+
+.cassette__play-btn {
+  background: none;
+  border: 1.5px solid var(--ink);
+  border-radius: 50%;
+  width: 24px;
+  height: 24px;
+  display: grid;
+  place-items: center;
+  font-size: 0.65rem;
+  cursor: pointer;
+  flex-shrink: 0;
+  transition: background 0.1s ease, color 0.1s ease;
+}
+.cassette__play-btn:hover {
+  background: var(--ink);
+  color: var(--paper);
+}
+
+.cassette__track-num {
+  font-family: var(--font-display);
+  font-size: 0.75rem;
+  color: var(--ink-faint);
+  width: 1.8em;
+  flex-shrink: 0;
+}
+
+.cassette__track-title {
+  flex: 1;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.cassette__track-dur {
+  font-family: var(--font-display);
+  font-size: 0.78rem;
+  color: var(--ink-faint);
+  flex-shrink: 0;
+}
+
+/* Playing bar */
+.cassette__playing-bar {
+  padding: 0.4rem 1.1rem;
+  background: var(--ink);
+  color: var(--paper);
+  font-family: var(--font-display);
+  font-size: 0.8rem;
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.cassette__playing-wave {
+  letter-spacing: 0.15em;
+  animation: bounce-wave 1.2s ease-in-out infinite alternate;
+}
+@keyframes bounce-wave {
+  from { letter-spacing: 0.1em; opacity: 0.8; }
+  to   { letter-spacing: 0.25em; opacity: 1; }
+}
+
+/* ── Note ────────────────────────────────────────── */
+.music-note {
+  font-size: 0.9rem;
+  color: var(--ink-mid);
+  background: var(--paper-dark);
+  transform: rotate(-0.3deg);
+  margin-bottom: 2rem;
+}
+.music-note code {
+  font-family: monospace;
+  background: rgba(28, 19, 10, 0.08);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* ── Description + tags inside cassette ─────────── */
+.cassette__desc {
+  padding: 0.5rem 1.1rem 0.4rem;
+  border-bottom: 1px dashed rgba(28, 19, 10, 0.2);
+}
+.cassette__desc-text {
+  font-size: 0.82rem;
+  color: var(--ink-mid);
+  margin-bottom: 0.4rem;
+}
+.cassette__tags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.3rem;
+}

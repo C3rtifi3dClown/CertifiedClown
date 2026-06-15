@@ -1,3 +1,11 @@
+<script setup lang="ts">
+import { computed } from 'vue'
+import { blogPosts, fanzines } from '../../data/mediaData'
+
+const featuredPost = computed(() => blogPosts[0])
+const featuredFanzine = computed(() => fanzines.find((zine) => Boolean(zine.pdfUrl)))
+</script>
+
 <template>
   <div class="view-container">
 
@@ -57,23 +65,45 @@
 
         <div class="sketch-box home-card animate-in" style="--rot: -1.2deg">
           <div class="home-card__type">✏️ Writing</div>
-          <h3 class="home-card__title">Coming soon</h3>
-          <p class="home-card__body">I'll put a real post here eventually. Promise.</p>
-          <span class="btn-sketch btn-sketch--blue home-card__link">read →</span>
+          <h3 class="home-card__title">{{ featuredPost?.title ?? 'New writing' }}</h3>
+          <p class="home-card__body">{{ featuredPost?.excerpt ?? 'Fresh notes from the writings section.' }}</p>
+          <RouterLink
+            v-if="featuredPost"
+            class="btn-sketch btn-sketch--blue home-card__link"
+            :to="{ name: 'writing-post', params: { slug: featuredPost.slug } }"
+          >
+            read →
+          </RouterLink>
+          <RouterLink v-else class="btn-sketch btn-sketch--blue home-card__link" :to="{ name: 'writings' }">
+            browse writings →
+          </RouterLink>
         </div>
 
         <div class="sketch-box home-card animate-in" style="--rot: 0.8deg">
           <div class="home-card__type">🎵 Music</div>
           <h3 class="home-card__title">Untitled EP</h3>
           <p class="home-card__body">Four songs recorded in a panic. Available nowhere for now.</p>
-          <span class="btn-sketch btn-sketch--red home-card__link">listen →</span>
+          <RouterLink class="btn-sketch btn-sketch--red home-card__link" :to="{ name: 'music' }">
+            listen →
+          </RouterLink>
         </div>
 
         <div class="sketch-box home-card animate-in" style="--rot: -0.5deg">
           <div class="home-card__type">📋 Fanzine</div>
           <h3 class="home-card__title">Issue #001</h3>
           <p class="home-card__body">16 pages of whatever I was thinking about that month.</p>
-          <span class="btn-sketch home-card__link">download →</span>
+          <a
+            v-if="featuredFanzine?.pdfUrl"
+            class="btn-sketch home-card__link"
+            :href="featuredFanzine.pdfUrl"
+            target="_blank"
+            rel="noopener noreferrer"
+          >
+            download →
+          </a>
+          <RouterLink v-else class="btn-sketch home-card__link" :to="{ name: 'fanzines' }">
+            open zines →
+          </RouterLink>
         </div>
 
       </div>

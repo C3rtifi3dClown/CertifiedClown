@@ -1,0 +1,142 @@
+/* ── Outer wrapper ────────────────────────────────── */
+.fz-viewer-wrap {
+  margin: 2rem 0;
+  /* slight wobbly tilt on the whole frame */
+  transform: rotate(-0.35deg);
+  transform-origin: center top;
+}
+
+/* ── Sketch frame ─────────────────────────────────── */
+.fz-viewer-frame {
+  position: relative;
+  background: var(--paper-dark);
+  /* hand-drawn border: unequal radii on all four corners */
+  border: 3px solid var(--ink);
+  border-radius: 4px 12px 5px 10px / 10px 4px 12px 5px;
+  /* double-stroke shadow gives that thick-pen feel */
+  box-shadow:
+    5px 5px 0 var(--ink),
+    8px 8px 0 rgba(28, 19, 10, 0.12);
+  overflow: hidden;
+}
+
+/* torn-paper stripe at the top */
+.fz-viewer-frame__tear {
+  height: 10px;
+  background: repeating-linear-gradient(
+    90deg,
+    var(--paper)      0px,
+    var(--paper-dark) 5px,
+    var(--paper)      10px
+  );
+  border-bottom: 2px solid rgba(28, 19, 10, 0.18);
+}
+
+/* ── Header bar ───────────────────────────────────── */
+.fz-viewer-frame__header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0.55rem 1rem 0.45rem;
+  border-bottom: 2px dashed rgba(28, 19, 10, 0.22);
+  background: var(--paper);
+}
+
+.fz-viewer-frame__label {
+  font-family: var(--font-display);
+  font-size: 0.82rem;
+  color: var(--ink-faint);
+  text-transform: uppercase;
+  letter-spacing: 0.07em;
+}
+
+.fz-viewer-frame__close {
+  font-size: 0.82rem;
+  padding: 0.25em 0.75em;
+}
+
+/* ── Scroll viewport ──────────────────────────────── */
+.fz-viewer__scroll {
+  /* fixed viewport height — pdf-vue3 fills this and scrolls inside it */
+  height: clamp(480px, 72vh, 860px);
+  overflow: hidden; /* pdf-vue3 manages its own internal scroll */
+  background: var(--paper-dark);
+}
+
+/* Force the pdf-vue3 root to fill the container */
+.fz-viewer__scroll :deep(.pdf-vue3-main) {
+  height: 100%;
+}
+
+/* ── Loading state ────────────────────────────────── */
+.fz-viewer__loading {
+  position: absolute;
+  inset: 52px 0 0; /* below header */
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.6rem;
+  background: var(--paper-dark);
+  z-index: 5;
+}
+
+.fz-viewer__loading-text {
+  font-family: var(--font-display);
+  font-size: 1.25rem;
+  color: var(--ink-mid);
+  animation: jitter 0.25s steps(2, end) infinite;
+}
+
+.fz-viewer__loading-dots {
+  font-family: var(--font-display);
+  font-size: 1.6rem;
+  color: var(--ink-faint);
+  letter-spacing: 0.35em;
+  animation: dots-blink 1.2s steps(3, end) infinite;
+}
+
+/* ── Error state ─────────────────────────────────── */
+.fz-viewer__error {
+  padding: 2rem 1.5rem;
+  font-family: var(--font-display);
+}
+
+.fz-viewer__error p:first-child {
+  color: #8c2f2f;
+  font-size: 1.05rem;
+  margin-bottom: 0.4rem;
+}
+
+.fz-viewer__error-hint {
+  color: var(--ink-mid);
+  font-size: 0.85rem;
+}
+
+.fz-viewer__error code {
+  font-family: monospace;
+  background: rgba(28, 19, 10, 0.08);
+  padding: 0.1em 0.3em;
+  border-radius: 3px;
+}
+
+/* ── Fade transition for loading overlay ─────────── */
+.fz-fade-leave-active {
+  transition: opacity 0.35s ease;
+}
+.fz-fade-leave-to {
+  opacity: 0;
+}
+
+/* ── Keyframes ───────────────────────────────────── */
+@keyframes jitter {
+  0%   { transform: translate(0, 0) rotate(-0.3deg); }
+  100% { transform: translate(1px, -1px) rotate(0.3deg); }
+}
+
+@keyframes dots-blink {
+  0%   { opacity: 1; }
+  33%  { opacity: 0.4; }
+  66%  { opacity: 0.8; }
+  100% { opacity: 1; }
+}

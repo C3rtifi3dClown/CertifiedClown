@@ -1,22 +1,6 @@
 <script setup lang="ts">
-import { ref } from 'vue'
-import type { Component } from 'vue'
+import GlobalMusicPlayer from './components/GlobalMusicPlayer.vue'
 import Navbar from './components/Navbar.vue'
-import HomeView from './views/HomeView.vue'
-import BlogView from './views/BlogView.vue'
-import MusicView from './views/MusicView.vue'
-import FanzinesView from './views/FanzinesView.vue'
-
-export type Tab = 'home' | 'blog' | 'music' | 'fanzines'
-
-const activeTab = ref<Tab>('home')
-
-const views: Record<Tab, Component> = {
-  home:     HomeView,
-  blog:     BlogView,
-  music:    MusicView,
-  fanzines: FanzinesView,
-}
 </script>
 
 <template>
@@ -43,13 +27,17 @@ const views: Record<Tab, Component> = {
   </svg>
 
   <div id="app-shell">
-    <Navbar :active-tab="activeTab" @change="activeTab = ($event as Tab)" />
+    <Navbar />
 
     <main class="main-content">
-      <Transition name="page" mode="out-in">
-        <component :is="views[activeTab]" :key="activeTab" />
-      </Transition>
+      <RouterView v-slot="{ Component, route }">
+        <Transition name="page" mode="out-in">
+          <component :is="Component" :key="route.fullPath" />
+        </Transition>
+      </RouterView>
     </main>
+
+    <GlobalMusicPlayer />
 
     <footer class="site-footer">
       made with ♥ &amp; too much coffee — certifiedclown
@@ -81,5 +69,12 @@ const views: Record<Tab, Component> = {
 
 .main-content {
   flex: 1;
+  padding-bottom: 7.25rem;
+}
+
+@media (max-width: 640px) {
+  .main-content {
+    padding-bottom: 6.5rem;
+  }
 }
 </style>

@@ -233,7 +233,7 @@ export const blogPosts = [
     excerpt: 'Photocopiers, scissors, glue sticks, and the analog brain.',
     tags: ['zines', 'making stuff', 'tangents'],
     rot: '-1.1deg',
-    url: 'https://f003.backblazeb2.com/file/certified-clown-medias/blog/example.md',
+    url: 'https://f003.backblazeb2.com/file/certified-clown-medias/blog/example1.md',
   },
   {
     id: 2,
@@ -243,7 +243,7 @@ export const blogPosts = [
     excerpt: 'One rainy gig and somehow still the best one.',
     tags: ['music', 'live', 'small venues'],
     rot: '0.7deg',
-    url: 'https://f003.backblazeb2.com/file/certified-clown-medias/blog/example.md',
+    url: 'https://f003.backblazeb2.com/file/certified-clown-medias/blog/example2.md',
   },
   {
     id: 3,
@@ -253,6 +253,6 @@ export const blogPosts = [
     excerpt: 'Seventeen unfinished songs and a suspicion that this is normal.',
     tags: ['process', 'creativity', 'rambling'],
     rot: '-0.6deg',
-    url: 'https://f003.backblazeb2.com/file/certified-clown-medias/blog/example.md',
+    url: 'https://f003.backblazeb2.com/file/certified-clown-medias/blog/example3.md',
   },
 ]

@@ -1,38 +1,54 @@
 <script setup lang="ts">
-import type { Tab } from '../App.vue'
+import { computed } from 'vue'
+import { useRoute } from 'vue-router'
 
-defineProps<{ activeTab: Tab }>()
-const emit = defineEmits<{ change: [tab: Tab] }>()
+const route = useRoute()
 
-const tabs: { id: Tab; label: string; icon: string }[] = [
-  { id: 'home',     label: 'Home',     icon: '🏠' },
-  { id: 'blog',     label: 'Writings', icon: '✏️' },
-  { id: 'music',    label: 'Music',    icon: '🎵' },
-  { id: 'fanzines', label: 'Fanzines', icon: '📋' },
+type NavId = 'home' | 'writings' | 'music' | 'fanzines'
+
+const tabs: { id: NavId; label: string; icon: string; to: string }[] = [
+  { id: 'home', label: 'Home', icon: '🏠', to: '/' },
+  { id: 'writings', label: 'Writings', icon: '✏️', to: '/writings' },
+  { id: 'music', label: 'Music', icon: '🎵', to: '/music' },
+  { id: 'fanzines', label: 'Fanzines', icon: '📋', to: '/fanzines' },
 ]
+
+const activeSection = computed<NavId>(() => {
+  if (route.path.startsWith('/writings')) {
+    return 'writings'
+  }
+  if (route.path.startsWith('/music')) {
+    return 'music'
+  }
+  if (route.path.startsWith('/fanzines')) {
+    return 'fanzines'
+  }
+
+  return 'home'
+})
 </script>
 
 <template>
   <header class="navbar">
     <div class="navbar__inner">
       <!-- Site logo / wordmark -->
-      <button class="navbar__logo" @click="emit('change', 'home')" aria-label="Go to home">
+      <RouterLink class="navbar__logo" to="/" aria-label="Go to home">
         <span class="navbar__logo-text">certified<span class="navbar__logo-accent">clown</span></span>
-      </button>
+      </RouterLink>
 
       <!-- Tab navigation -->
       <nav class="navbar__tabs" aria-label="Main navigation">
-        <button
+        <RouterLink
           v-for="tab in tabs"
           :key="tab.id"
           class="navbar__tab"
-          :class="{ 'navbar__tab--active': activeTab === tab.id }"
-          @click="emit('change', tab.id)"
-          :aria-current="activeTab === tab.id ? 'page' : undefined"
+          :class="{ 'navbar__tab--active': activeSection === tab.id }"
+          :to="tab.to"
+          :aria-current="activeSection === tab.id ? 'page' : undefined"
         >
           <span class="navbar__tab-icon" aria-hidden="true">{{ tab.icon }}</span>
           <span class="navbar__tab-label">{{ tab.label }}</span>
-        </button>
+        </RouterLink>
       </nav>
     </div>
   </header>
@@ -64,8 +80,8 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
 
 /* ── Logo / wordmark ─────────────────────────────── */
 .navbar__logo {
+  display: inline-block;
   background: none;
-  border: none;
   cursor: pointer;
   padding: 0;
   font-family: var(--font-display);
@@ -73,6 +89,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
   color: var(--ink);
   letter-spacing: -0.01em;
   transition: transform 0.15s ease;
+  text-decoration: none;
 }
 .navbar__logo:hover {
   transform: rotate(-1.5deg) scale(1.04);
@@ -106,6 +123,7 @@ const tabs: { id: Tab; label: string; icon: string }[] = [
     color        0.12s ease,
     transform    0.12s ease,
     box-shadow   0.12s ease;
+  text-decoration: none;
 }
 
 .navbar__tab-icon {
